@@ -53,10 +53,13 @@ public:
   Gtk::Label status_diagnostics;
   Gtk::Label status_state;
   void update_status(Source::BaseView *view);
+  void update_labels(const boost::filesystem::path &path);
   void clear_status();
   
   std::function<void(Source::View*)> on_change_page;
   std::function<void(Source::View*)> on_close_page;
+  std::function<void(Source::BaseView *view)> update_tab_label;
+  std::function<void(Source::BaseView *view)> update_modified;
   
   /// Cursor history
   std::vector<CursorLocation> cursor_locations;

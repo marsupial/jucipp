@@ -268,7 +268,7 @@ void Notebook::open(const boost::filesystem::path &file_path_, size_t notebook_i
     if(index!=static_cast<size_t>(-1))
       close(index);
   }));
-  source_view->update_tab_label=[this](Source::BaseView *view) {
+  update_tab_label = [this](Source::BaseView *view) {
     std::string title=view->file_path.filename().string();
     if(view->get_buffer()->get_modified())
       title+='*';
@@ -283,14 +283,13 @@ void Notebook::open(const boost::filesystem::path &file_path_, size_t notebook_i
       }
     }
   };
-  source_view->update_tab_label(source_view);
-  
-  //Add star on tab label when the page is not saved:
-  source_view->get_buffer()->signal_modified_changed().connect([source_view]() {
-    if(source_view->update_tab_label)
-      source_view->update_tab_label(source_view);
+  update_tab_label(source_view);
+  source_view->get_buffer()->signal_modified_changed().connect([this, source_view]() {
+    if (update_tab_label) {
+      update_tab_label(source_view);
+    }
   });
-  
+
   //Cursor history
   auto update_cursor_locations=[this, source_view](const Gtk::TextBuffer::iterator &iter) {
     bool mark_moved=false;

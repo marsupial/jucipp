@@ -69,7 +69,7 @@ bool Directories::TreeStore::drag_data_received_vfunc(const TreeModel::Path &pat
       Terminal::get().print("Error: could not move file: "+ec.message()+'\n', true);
       return false;
     }
-    
+    auto new_file_path = target_path;
     for(size_t c=0;c<Notebook::get().size();c++) {
       auto view=Notebook::get().get_view(c);
       if(is_directory) {
@@ -77,7 +77,6 @@ bool Directories::TreeStore::drag_data_received_vfunc(const TreeModel::Path &pat
           auto file_it=view->file_path.begin();
           for(auto source_it=source_path.begin();source_it!=source_path.end();source_it++)
             file_it++;
-          auto new_file_path=target_path;
           for(;file_it!=view->file_path.end();file_it++)
             new_file_path/=*file_it;
           view->rename(new_file_path);
@@ -88,7 +87,7 @@ bool Directories::TreeStore::drag_data_received_vfunc(const TreeModel::Path &pat
         break;
       }
     }
-    
+    Notebook::get().update_labels(new_file_path);
     Directories::get().update();
     Directories::get().on_save_file(target_path);
     directories.select(target_path);
@@ -262,7 +261,7 @@ Directories::Directories() : Gtk::ListViewText(1) {
       update();
       on_save_file(target_path);
       select(target_path);
-      
+      auto new_file_path = target_path;
       for(size_t c=0;c<Notebook::get().size();c++) {
         auto view=Notebook::get().get_view(c);
         if(is_directory) {
@@ -270,7 +269,6 @@ Directories::Directories() : Gtk::ListViewText(1) {
             auto file_it=view->file_path.begin();
             for(auto source_it=source_path.begin();source_it!=source_path.end();source_it++)
               file_it++;
-            auto new_file_path=target_path;
             for(;file_it!=view->file_path.end();file_it++)
               new_file_path/=*file_it;
             view->rename(new_file_path);
@@ -278,7 +276,6 @@ Directories::Directories() : Gtk::ListViewText(1) {
         }
         else if(view->file_path==source_path) {
           view->rename(target_path);
-          
           std::string old_language_id;
           if(view->language)
             old_language_id=view->language->get_id();
@@ -290,7 +287,7 @@ Directories::Directories() : Gtk::ListViewText(1) {
             Terminal::get().print("Warning: language for "+target_path.string()+" has changed. Please reopen the file\n");
         }
       }
-      
+      Notebook::get().update_labels(new_file_path);
       EntryBox::get().hide();
     });
     

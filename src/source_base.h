@@ -75,7 +75,6 @@ namespace Source {
     std::set<int> diagnostic_offsets;
     void place_cursor_at_next_diagnostic();
   public:
-    std::function<void(BaseView *view)> update_tab_label;
     std::function<void(BaseView *view)> update_status_location;
     std::function<void(BaseView *view)> update_status_file_path;
     std::function<void(BaseView *view)> update_status_diagnostics;
